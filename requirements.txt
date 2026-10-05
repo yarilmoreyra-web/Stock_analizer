@@ -1,0 +1,3 @@
+longbridge-openapi
+pandas
+openpyxl
