@@ -1,3 +1,4 @@
 longbridge
 pandas
 openpyxl
+yfinance
