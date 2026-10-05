@@ -5,7 +5,7 @@ from datetime import datetime
 from longbridge.openapi import QuoteContext, Config
 
 def fetch_longbridge_data(tickers):
-    # 1. Obtener las credenciales directamente del entorno
+    # Verificar que las credenciales existen en el entorno
     app_key = os.environ.get("LONGBRIDGE_APP_KEY")
     app_secret = os.environ.get("LONGBRIDGE_APP_SECRET")
     access_token = os.environ.get("LONGBRIDGE_ACCESS_TOKEN")
@@ -15,8 +15,8 @@ def fetch_longbridge_data(tickers):
         return pd.DataFrame()
 
     try:
-        # 2. Inicializar la configuración de forma explícita
-        config = Config(app_key=app_key, app_secret=app_secret, access_token=access_token)
+        # El SDK de Longbridge requiere este método específico para leer desde os.environ
+        config = Config.from_apikey_env()
         ctx = QuoteContext(config)
     except Exception as e:
         print(f"Error de autenticación con Longbridge: {e}")
@@ -53,11 +53,10 @@ def fetch_longbridge_data(tickers):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extractor de datos fundamentales vía Longbridge")
-    parser.add_argument("--tickers", type=str, required=True, 
-                        help="Tickers separados por comas. Ej: AAPL.US, TSLA.US")
+    parser.add_argument("--tickers", type=str, required=True, help="Tickers separados por comas")
     args = parser.parse_args()
     
-    # 3. Limpieza robusta: divide por coma y elimina espacios y cualquier tipo de comilla
+    # Limpieza de comillas internas y espacios en blanco
     raw_tickers = args.tickers.split(',')
     tickers_list = [t.strip(' "\'') for t in raw_tickers if t.strip(' "\'')]
     
